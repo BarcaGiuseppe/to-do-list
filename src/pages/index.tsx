@@ -60,7 +60,7 @@ const RemoveButton = styled.button(() => ({
 }));
 
 export default function Home() {
-  const { toDoList, removeFromList, changeCheckToDo } = useDataByContext();
+  const { toDoList, removeFromList, updateCheckList } = useDataByContext();
 
   //console.log(toDoList);
 
@@ -69,7 +69,7 @@ export default function Home() {
   };
 
   const handleChangeCheckStatus = (id: ToDo["id"]) => {
-    changeCheckToDo(id);
+    updateCheckList(id);
   };
 
   return (

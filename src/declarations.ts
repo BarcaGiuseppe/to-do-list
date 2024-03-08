@@ -3,11 +3,10 @@ export type ToDo = {
   id: number;
   title: string;
   body: string;
-  check: boolean;
 };
 
 export interface TContext {
   toDoList: Array<ToDo>;
   removeFromList: (idToDo: ToDo["id"]) => void;
-  changeCheckToDo: (idToDo: ToDo["id"]) => void;
+  updateCheckList: (idToDo: ToDo["id"]) => void;
 }

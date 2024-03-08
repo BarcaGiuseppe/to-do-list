@@ -10,7 +10,7 @@ import { ToDo, TContext } from "./declarations";
 export const AppContext = createContext<TContext>({
   toDoList: [],
   removeFromList: () => {},
-  changeCheckToDo: () => {},
+  updateCheckList: () => {},
 });
 
 interface Props {
@@ -21,35 +21,27 @@ export const useDataByContext = () => useContext(AppContext);
 
 export function ContextProvider({ children }: Props) {
   const [toDoList, setToDoList] = useState<TContext["toDoList"]>([]);
+  const [checkList, setCheckList] = useState<Array<ToDo["id"]>>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
-  console.log(toDoList);
+  //   console.log(toDoList);
+  //   console.log(checkList);
 
   const removeFromList = (idToDo: ToDo["id"]) => {
     const newList = toDoList.filter((toDo) => toDo.id !== idToDo);
     setToDoList(newList);
   };
 
-  const addCheckToItem = (data: any) => {
-    const newData = data.map((elem: any) => {
-      return {
-        userId: elem.userId,
-        id: elem.id,
-        title: elem.title,
-        body: elem.body,
-        check: false,
-      };
-    });
-    return newData;
-  };
-
-  const changeCheckToDo = (idToDo: ToDo["id"]) => {
-    const newToDoList = toDoList.map((elem) => {
-      if (elem.id === idToDo) return { ...elem, check: !elem.check };
-      return elem;
-    });
-    setToDoList(newToDoList);
+  const updateCheckList = (idToDo: ToDo["id"]) => {
+    const findId = checkList.find((elem) => elem === idToDo);
+    if (!!findId) {
+      const newCheckList = checkList.filter((elem) => elem !== idToDo);
+      setCheckList(newCheckList);
+    } else {
+      const newCheckList = [...checkList, idToDo];
+      setCheckList(newCheckList);
+    }
   };
 
   const getToDoList = async () => {
@@ -59,8 +51,7 @@ export function ContextProvider({ children }: Props) {
         "https://jsonplaceholder.typicode.com/posts"
       );
       const data = await response.json();
-      const newData = addCheckToItem(data);
-      setToDoList(newData);
+      setToDoList(data);
       setLoading(false);
     } catch (error: any) {
       setError(error.message);
@@ -77,28 +68,10 @@ export function ContextProvider({ children }: Props) {
       value={{
         toDoList,
         removeFromList,
-        changeCheckToDo,
+        updateCheckList,
       }}
     >
       {children}
     </AppContext.Provider>
   );
-}
-
-export async function getServerSideProps() {
-  //const products = await fetchData();
-  //   const res = await fetch(process.env.VERCEL_URL + "/api/products");
-  //   const list2 = await res.json();
-
-  try {
-    const response = await fetch("https://jsonplaceholder.typicode.com/posts");
-    const list = await response.json();
-    return {
-      props: {
-        list,
-      },
-    };
-  } catch (error: any) {
-    throw error;
-  }
 }
